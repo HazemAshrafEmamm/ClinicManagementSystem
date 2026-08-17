@@ -1,0 +1,51 @@
+@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "تسجيل الدخول";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-primary">تسجيل الدخول</h2>
+                    <p class="text-muted">مرحباً بك مجدداً في نظام إدارة العيادة</p>
+                </div>
+                <hr />
+                <form id="account" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                        <label asp-for="Input.Email" class="form-label">البريد الإلكتروني</label>
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+                        <label asp-for="Input.Password" class="form-label">كلمة المرور</label>
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+                    <div class="checkbox mb-4 d-flex justify-content-between align-items-center">
+                        <label asp-for="Input.RememberMe" class="form-label m-0 cursor-pointer">
+                            <input class="form-check-input me-2" asp-for="Input.RememberMe" />
+                            تذكرني
+                        </label>
+                    </div>
+                    <div>
+                        <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary rounded-pill fw-bold">دخول</button>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <p class="mb-2">
+                            <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="text-decoration-none text-secondary">ليس لديك حساب؟ سجل كمرض جديد</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

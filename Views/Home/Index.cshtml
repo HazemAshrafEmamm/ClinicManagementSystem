@@ -1,0 +1,139 @@
+@model IEnumerable<ClinicManagementSystem.Models.Appointment>
+@using ClinicManagementSystem.Models
+
+@{
+    ViewData["Title"] = "لوحة التحكم";
+}
+
+<div class="text-center mb-4">
+    <h1 class="display-4">نظام إدارة العيادة</h1>
+    <p>أهلاً بك في لوحة تحكم النظام</p>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-3">
+        <div class="card bg-gradient-primary border-0 rounded-4 shadow-sm mb-3 text-white text-center">
+            <div class="card-body py-4">
+                <h6 class="text-white-50 fw-bold mb-2">إجمالي التخصصات</h6>
+                <h2 class="display-5 fw-bold mb-0">@ViewBag.TotalSpecialties</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-gradient-success border-0 rounded-4 shadow-sm mb-3 text-white text-center">
+            <div class="card-body py-4">
+                <h6 class="text-white-50 fw-bold mb-2">إجمالي الأطباء</h6>
+                <h2 class="display-5 fw-bold mb-0">@ViewBag.TotalDoctors</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-gradient-warning border-0 rounded-4 shadow-sm mb-3 text-white text-center">
+            <div class="card-body py-4">
+                <h6 class="text-white-50 fw-bold mb-2">إجمالي المرضى</h6>
+                <h2 class="display-5 fw-bold mb-0">@ViewBag.TotalPatients</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-gradient-danger border-0 rounded-4 shadow-sm mb-3 text-white text-center">
+            <div class="card-body py-4">
+                <h6 class="text-white-50 fw-bold mb-2">إجمالي المواعيد</h6>
+                <h2 class="display-5 fw-bold mb-0">@ViewBag.TotalAppointments</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="fw-bold mb-3 text-primary">إحصائيات اليوم</h4>
+<div class="row mb-5">
+    <div class="col-md">
+        <div class="card bg-white border-0 rounded-4 shadow-sm mb-3 text-center">
+            <div class="card-body py-4">
+                <h6 class="text-muted fw-bold mb-2">مواعيد اليوم</h6>
+                <h2 class="display-6 fw-bold text-dark mb-0">@ViewBag.TodayCount</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md">
+        <div class="card bg-white border-0 rounded-4 shadow-sm mb-3 text-center">
+            <div class="card-body py-4">
+                <h6 class="text-muted fw-bold mb-2">قيد الانتظار اليوم</h6>
+                <h2 class="display-6 fw-bold text-warning mb-0">@ViewBag.TodayPending</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md">
+        <div class="card bg-white border-0 rounded-4 shadow-sm mb-3 text-center">
+            <div class="card-body py-4">
+                <h6 class="text-muted fw-bold mb-2">مؤكدة اليوم</h6>
+                <h2 class="display-6 fw-bold text-primary mb-0">@ViewBag.TodayConfirmed</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md">
+        <div class="card bg-white border-0 rounded-4 shadow-sm mb-3 text-center">
+            <div class="card-body py-4">
+                <h6 class="text-muted fw-bold mb-2">المكتملة اليوم</h6>
+                <h2 class="display-6 fw-bold text-success mb-0">@ViewBag.TodayCompleted</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md">
+        <div class="card bg-white border-0 rounded-4 shadow-sm mb-3 text-center">
+            <div class="card-body py-4">
+                <h6 class="text-muted fw-bold mb-2">الملغاة اليوم</h6>
+                <h2 class="display-6 fw-bold text-danger mb-0">@ViewBag.TodayCancelled</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3>قائمة مواعيد اليوم</h3>
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th>التاريخ والوقت</th>
+            <th>الطبيب</th>
+            <th>المريض</th>
+            <th>الحالة</th>
+        </tr>
+    </thead>
+    <tbody>
+    @if(Model != null && Model.Any())
+    {
+        foreach(var appt in Model)
+        {
+            <tr>
+                <td dir="ltr" class="text-end">@appt.AppointmentDate.ToString("HH:mm")</td>
+                <td>@appt.Doctor.FullName</td>
+                <td>@appt.Patient.FullName</td>
+                <td>
+                    @if(appt.Status == AppointmentStatus.Pending)
+                    {
+                        <span class="badge bg-warning text-dark">قيد الانتظار</span>
+                    }
+                    else if (appt.Status == AppointmentStatus.Confirmed)
+                    {
+                        <span class="badge bg-primary">مؤكد</span>
+                    }
+                    else if (appt.Status == AppointmentStatus.Completed)
+                    {
+                        <span class="badge bg-success">مكتمل</span>
+                    }
+                    else if (appt.Status == AppointmentStatus.Cancelled)
+                    {
+                        <span class="badge bg-danger">ملغى</span>
+                    }
+                </td>
+            </tr>
+        }
+    }
+    else
+    {
+        <tr>
+            <td colspan="4" class="text-center">لا توجد مواعيد اليوم.</td>
+        </tr>
+    }
+    </tbody>
+</table>

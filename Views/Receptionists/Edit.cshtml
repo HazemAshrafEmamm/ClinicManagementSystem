@@ -1,0 +1,52 @@
+@model ClinicManagementSystem.Models.Receptionist
+
+@{
+    ViewData["Title"] = "تعديل بيانات موظف الاستقبال";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg border-0 rounded-4" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);">
+            <div class="card-header bg-warning text-dark rounded-top-4 py-3">
+                <h4 class="mb-0 fw-bold">تعديل بيانات موظف الاستقبال</h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="UserId" />
+                    <input type="hidden" asp-for="Email" />
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="FullName" class="form-label fw-bold"></label>
+                            <input asp-for="FullName" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Phone" class="form-label fw-bold"></label>
+                            <input asp-for="Phone" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="Phone" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <label asp-for="Email" class="form-label fw-bold"></label>
+                            <input asp-for="Email" type="email" class="form-control form-control-lg bg-light" dir="ltr" disabled />
+                            <div class="form-text text-muted">لا يمكن تغيير البريد الإلكتروني لأنه مرتبط بحساب تسجيل الدخول.</div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">إلغاء</a>
+                        <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm">حفظ التعديلات</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

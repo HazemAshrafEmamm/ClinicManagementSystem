@@ -1,0 +1,48 @@
+@model ClinicManagementSystem.Models.Doctor
+
+@{
+    ViewData["Title"] = "تعديل طبيب";
+}
+
+<h1>تعديل طبيب</h1>
+
+<h4>الطبيب</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group mb-3">
+                <label asp-for="FullName" class="control-label"></label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Phone" class="control-label"></label>
+                <input asp-for="Phone" class="form-control" dir="ltr" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" dir="ltr" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="SpecialtyId" class="control-label"></label>
+                <select asp-for="SpecialtyId" class="form-control" asp-items="ViewBag.Specialties">
+                    <option value="">-- اختر التخصص --</option>
+                </select>
+                <span asp-validation-for="SpecialtyId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="حفظ" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">العودة للقائمة</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

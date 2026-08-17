@@ -1,0 +1,36 @@
+@model IEnumerable<ClinicManagementSystem.Models.Specialty>
+
+@{
+    ViewData["Title"] = "التخصصات";
+}
+
+<h1>التخصصات</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">إضافة تخصص جديد</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>إجراءات</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">تعديل</a> |
+                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا التخصص؟');">
+                    <button type="submit" class="btn btn-sm btn-danger">حذف</button>
+                </form>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

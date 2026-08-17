@@ -1,0 +1,116 @@
+@model IEnumerable<ClinicManagementSystem.Models.Appointment>
+@{
+    ViewData["Title"] = "مواعيدي";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>مواعيدي</h1>
+    <a asp-action="BookAppointment" class="btn btn-primary"><i class="bi bi-plus-circle"></i> حجز موعد جديد</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">لا يوجد لديك أي مواعيد مسجلة حتى الآن.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>الطبيب</th>
+                            <th>التخصص</th>
+                            <th>تاريخ ووقت الموعد</th>
+                            <th>الحالة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold">
+                                    <i class="bi bi-person-circle text-primary me-1"></i> @item.Doctor.FullName
+                                </td>
+                                <td>@item.Doctor.Specialty.Name</td>
+                                <td><i class="bi bi-clock text-muted me-1"></i> @item.AppointmentDate.ToString("yyyy/MM/dd hh:mm tt")</td>
+                                <td>
+                                    @{
+                                        var badgeInfo = item.Status switch
+                                        {
+                                            ClinicManagementSystem.Models.AppointmentStatus.Pending => new { Class = "bg-warning text-dark", Icon = "bi-hourglass-split", Text = "قيد الانتظار" },
+                                            ClinicManagementSystem.Models.AppointmentStatus.Confirmed => new { Class = "bg-info text-dark", Icon = "bi-calendar-check", Text = "مؤكد" },
+                                            ClinicManagementSystem.Models.AppointmentStatus.Completed => new { Class = "bg-success", Icon = "bi-check2-all", Text = "مكتمل" },
+                                            ClinicManagementSystem.Models.AppointmentStatus.Cancelled => new { Class = "bg-danger", Icon = "bi-x-circle", Text = "ملغى" },
+                                            _ => new { Class = "bg-secondary", Icon = "bi-question-circle", Text = item.Status.ToString() }
+                                        };
+                                    }
+                                    <span class="badge @badgeInfo.Class px-3 py-2 rounded-pill"><i class="bi @badgeInfo.Icon"></i> @badgeInfo.Text</span>
+                                </td>
+                                <td>
+                                    @if (item.Status == ClinicManagementSystem.Models.AppointmentStatus.Pending)
+                                    {
+                                        <button type="button" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm d-inline-block" data-bs-toggle="modal" data-bs-target="#contactModal_@item.Id">
+                                            <i class="bi bi-whatsapp"></i> تواصل للتأكيد
+                                        </button>
+
+                                        <form asp-action="CancelAppointment" method="post" class="d-inline-block ms-1">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3 shadow-sm" onclick="return confirm('هل أنت متأكد من إلغاء هذا الموعد؟');">
+                                                <i class="bi bi-trash"></i> إلغاء
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted opacity-50"><i class="bi bi-dash"></i> لا توجد إجراءات متاحة</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+@if (Model.Any(a => a.Status == ClinicManagementSystem.Models.AppointmentStatus.Pending))
+{
+    @foreach (var item in Model.Where(a => a.Status == ClinicManagementSystem.Models.AppointmentStatus.Pending))
+    {
+        <!-- Contact Modal -->
+        <div class="modal fade" id="contactModal_@item.Id" tabindex="-1" aria-labelledby="contactModalLabel_@item.Id" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="contactModalLabel_@item.Id">اختر موظف الاستقبال لتأكيد الحجز</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                <div class="list-group list-group-flush">
+                    @if (ViewBag.Receptionists != null)
+                    {
+                        foreach (var rec in ViewBag.Receptionists)
+                        {
+                            <a href="https://wa.me/2@(rec.Phone)?text=مرحباً، أريد تأكيد حجزي المبدئي عبر الموقع (رقم الموعد: @item.Id)" target="_blank" class="list-group-item list-group-item-action py-3 d-flex align-items-center">
+                                <i class="bi bi-whatsapp text-success fs-4 me-3"></i>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">@rec.FullName</h6>
+                                    <small class="text-muted">تواصل عبر الواتساب</small>
+                                </div>
+                            </a>
+                        }
+                    }
+                </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+            </div>
+        </div>
+    }
+}

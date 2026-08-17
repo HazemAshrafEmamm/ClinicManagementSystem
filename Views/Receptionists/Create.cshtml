@@ -1,0 +1,55 @@
+@model ClinicManagementSystem.Models.Receptionist
+
+@{
+    ViewData["Title"] = "إضافة موظف استقبال جديد";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg border-0 rounded-4" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);">
+            <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                <h4 class="mb-0 fw-bold">إضافة موظف استقبال جديد</h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="FullName" class="form-label fw-bold"></label>
+                            <input asp-for="FullName" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Phone" class="form-label fw-bold"></label>
+                            <input asp-for="Phone" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="Phone" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <label asp-for="Email" class="form-label fw-bold"></label>
+                            <input asp-for="Email" type="email" class="form-control form-control-lg bg-light" dir="ltr" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                            <div class="form-text text-muted">سيتم استخدام هذا البريد الإلكتروني كاسم مستخدم (Username) لتسجيل الدخول.</div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info border-0 rounded-3 mt-4">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        سيتم إنشاء حساب دخول تلقائياً لهذا الموظف بكلمة المرور الافتراضية: <strong>Receptionist123!</strong>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">إلغاء</a>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">حفظ وإضافة</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

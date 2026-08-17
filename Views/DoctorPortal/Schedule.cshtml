@@ -1,0 +1,121 @@
+@model IEnumerable<ClinicManagementSystem.Models.DoctorSchedule>
+@{
+    ViewData["Title"] = "مواعيد العمل";
+}
+
+<div class="glass-container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0 text-primary"><i class="fas fa-calendar-alt me-2"></i> مواعيد عمل الطبيب: @ViewBag.DoctorName</h2>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card glass-card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-secondary mb-4"><i class="fas fa-plus-circle me-2"></i> إضافة موعد جديد</h5>
+                    <form asp-action="AddSchedule" method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">اليوم</label>
+                            <select name="dayOfWeek" class="form-select" required>
+                                <option value="0">الأحد</option>
+                                <option value="1">الإثنين</option>
+                                <option value="2">الثلاثاء</option>
+                                <option value="3">الأربعاء</option>
+                                <option value="4">الخميس</option>
+                                <option value="5">الجمعة</option>
+                                <option value="6">السبت</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label fw-bold">من الساعة</label>
+                                <input type="time" name="startTime" class="form-control" required />
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label fw-bold">إلى الساعة</label>
+                                <input type="time" name="endTime" class="form-control" required />
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill mt-3">
+                            <i class="fas fa-save me-2"></i> حفظ الموعد
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="card glass-card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-secondary mb-4"><i class="fas fa-list me-2"></i> المواعيد الحالية</h5>
+                    
+                    @if (!Model.Any())
+                    {
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle me-2"></i> لا يوجد مواعيد عمل مسجلة حالياً.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light text-secondary">
+                                    <tr>
+                                        <th>اليوم</th>
+                                        <th>من</th>
+                                        <th>إلى</th>
+                                        <th class="text-center">إجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var schedule in Model)
+                                    {
+                                        var dayName = schedule.DayOfWeek switch {
+                                            DayOfWeek.Sunday => "الأحد",
+                                            DayOfWeek.Monday => "الإثنين",
+                                            DayOfWeek.Tuesday => "الثلاثاء",
+                                            DayOfWeek.Wednesday => "الأربعاء",
+                                            DayOfWeek.Thursday => "الخميس",
+                                            DayOfWeek.Friday => "الجمعة",
+                                            DayOfWeek.Saturday => "السبت",
+                                            _ => ""
+                                        };
+                                        <tr>
+                                            <td class="fw-bold">@dayName</td>
+                                            <td>@schedule.StartTime.ToString(@"hh\:mm")</td>
+                                            <td>@schedule.EndTime.ToString(@"hh\:mm")</td>
+                                            <td class="text-center">
+                                                <form asp-action="DeleteSchedule" method="post" onsubmit="return confirm('هل أنت متأكد من حذف هذا الموعد؟');">
+                                                    <input type="hidden" name="id" value="@schedule.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                                                        <i class="fas fa-trash-alt"></i> حذف
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

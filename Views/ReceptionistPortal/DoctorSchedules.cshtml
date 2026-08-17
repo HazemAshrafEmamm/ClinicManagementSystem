@@ -1,0 +1,77 @@
+@model IEnumerable<ClinicManagementSystem.Models.Doctor>
+
+@{
+    ViewData["Title"] = "جداول الأطباء";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold"><i class="bi bi-calendar3 text-primary me-2"></i> جداول عمل الأطباء</h1>
+</div>
+
+<div class="row">
+    @if (!Model.Any())
+    {
+        <div class="col-12">
+            <div class="alert alert-warning">لا يوجد أطباء مسجلين في النظام.</div>
+        </div>
+    }
+    else
+    {
+        @foreach (var doctor in Model)
+        {
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm border-0 rounded-4">
+                    <div class="card-header bg-primary text-white rounded-top-4 py-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-white rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                <i class="bi bi-person-fill text-primary fs-3"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0 fw-bold">@doctor.FullName</h5>
+                                <span class="badge bg-light text-primary mt-1">@doctor.Specialty?.Name</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        @if (doctor.Schedules != null && doctor.Schedules.Any())
+                        {
+                            <div class="list-group list-group-flush">
+                                @foreach (var schedule in doctor.Schedules.OrderBy(s => s.DayOfWeek))
+                                {
+                                    var dayName = schedule.DayOfWeek switch {
+                                        DayOfWeek.Sunday => "الأحد",
+                                        DayOfWeek.Monday => "الإثنين",
+                                        DayOfWeek.Tuesday => "الثلاثاء",
+                                        DayOfWeek.Wednesday => "الأربعاء",
+                                        DayOfWeek.Thursday => "الخميس",
+                                        DayOfWeek.Friday => "الجمعة",
+                                        DayOfWeek.Saturday => "السبت",
+                                        _ => ""
+                                    };
+
+                                    <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-bottom">
+                                        <div class="fw-bold">
+                                            <i class="bi bi-calendar-check text-success me-2 fs-5 align-middle"></i> 
+                                            @dayName
+                                        </div>
+                                        <div class="text-muted text-end">
+                                            <div class="small"><i class="bi bi-clock me-1"></i> من @DateTime.Today.Add(schedule.StartTime).ToString("hh:mm tt")</div>
+                                            <div class="small"><i class="bi bi-clock-fill me-1"></i> إلى @DateTime.Today.Add(schedule.EndTime).ToString("hh:mm tt")</div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center text-muted py-4">
+                                <i class="bi bi-calendar-x fs-1 d-block mb-3 text-danger opacity-50"></i>
+                                <span>لا يوجد جدول عمل مسجل لهذا الطبيب.</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

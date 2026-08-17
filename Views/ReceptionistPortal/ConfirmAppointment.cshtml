@@ -1,0 +1,148 @@
+@model ClinicManagementSystem.Models.Appointment
+
+@{
+    ViewData["Title"] = "تأكيد وتحديد وقت الموعد";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 rounded-4" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);">
+                <div class="card-header bg-success text-white rounded-top-4 py-3">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-check-circle me-2"></i> تأكيد الحجز وتحديد الوقت</h4>
+                </div>
+                <div class="card-body p-4">
+                    
+                    <div class="alert alert-info border-0 rounded-3 shadow-sm mb-4">
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <strong>المريض:</strong> @Model.Patient?.FullName
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong>الهاتف:</strong> @Model.Patient?.Phone
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong>الطبيب:</strong> @Model.Doctor?.FullName
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong>التاريخ المبدئي:</strong> @Model.AppointmentDate.ToString("yyyy-MM-dd")
+                            </div>
+                        </div>
+                    </div>
+
+                    @* New Info Panel for Receptionist Scheduling Aid *@
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card border-info shadow-sm h-100">
+                                <div class="card-header bg-info text-dark fw-bold">
+                                    <i class="bi bi-clock-history"></i> دوام الطبيب في هذا اليوم
+                                </div>
+                                <div class="card-body bg-light">
+                                    @if (ViewBag.DoctorSchedule != null)
+                                    {
+                                        var schedule = (ClinicManagementSystem.Models.DoctorSchedule)ViewBag.DoctorSchedule;
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-calendar-check fs-4 text-success me-2"></i>
+                                            <span class="fs-5 fw-bold text-success">يعمل</span>
+                                        </div>
+                                        <p class="mb-1"><strong>من:</strong> @DateTime.Today.Add(schedule.StartTime).ToString("hh:mm tt")</p>
+                                        <p class="mb-0"><strong>إلى:</strong> @DateTime.Today.Add(schedule.EndTime).ToString("hh:mm tt")</p>
+                                    }
+                                    else
+                                    {
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-calendar-x fs-4 text-danger me-2"></i>
+                                            <span class="fs-5 fw-bold text-danger">لا يوجد دوام مسجل</span>
+                                        </div>
+                                        <p class="text-muted small">هذا الطبيب ليس له مواعيد عمل مسجلة في هذا اليوم. يرجى مراجعة الجدول.</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card border-warning shadow-sm h-100">
+                                <div class="card-header bg-warning text-dark fw-bold">
+                                    <i class="bi bi-people"></i> المرضى المحجوزين في هذا اليوم
+                                </div>
+                                <div class="card-body bg-light p-0" style="max-height: 150px; overflow-y: auto;">
+                                    @if (ViewBag.ExistingAppointments != null)
+                                    {
+                                        var existingList = (List<ClinicManagementSystem.Models.Appointment>)ViewBag.ExistingAppointments;
+                                        if (existingList.Any())
+                                        {
+                                            <div class="list-group list-group-flush">
+                                                @foreach (var app in existingList)
+                                                {
+                                                    <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <span class="fw-bold">@app.Patient.FullName</span>
+                                                            <br />
+                                                            <small class="text-muted">@app.Status.ToString()</small>
+                                                        </div>
+                                                        <span class="badge bg-secondary rounded-pill">
+                                                            @app.AppointmentDate.ToString("hh:mm tt")
+                                                        </span>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="p-3 text-center text-muted">
+                                                لا يوجد حجوزات أخرى في هذا اليوم.
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form asp-action="ConfirmAppointment" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <div class="mb-4">
+                            <label asp-for="AppointmentDate" class="form-label fw-bold">الوقت الدقيق للموعد</label>
+                            <input asp-for="AppointmentDate" type="datetime-local" class="form-control form-control-lg bg-light" />
+                            <span asp-validation-for="AppointmentDate" class="text-danger"></span>
+                            <div class="form-text">يرجى التأكد من التنسيق مع المريض حول هذا الوقت.</div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="PaymentMethod" class="form-label fw-bold">طريقة الدفع</label>
+                                <select asp-for="PaymentMethod" class="form-select form-select-lg bg-light">
+                                    <option value="">-- اختر طريقة الدفع --</option>
+                                    <option value="Cash">كاش (في العيادة)</option>
+                                    <option value="InstaPay">إنستا باي (تحويل مسبق)</option>
+                                    <option value="Card">بطاقة ائتمانية</option>
+                                    <option value="Other">أخرى</option>
+                                </select>
+                                <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end">
+                                <div class="form-check form-switch fs-4 ms-2 mb-2">
+                                    <input class="form-check-input" type="checkbox" asp-for="IsPaid" id="isPaidSwitch">
+                                    <label class="form-check-label fs-5 ms-2" for="isPaidSwitch">تم الدفع بنجاح</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-success btn-lg rounded-pill fw-bold shadow-sm">
+                                <i class="bi bi-save me-2"></i> حفظ وتأكيد الحجز
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">إلغاء والعودة</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

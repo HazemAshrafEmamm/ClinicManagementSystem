@@ -1,0 +1,55 @@
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@using ClinicManagementSystem.Data
+@inject ApplicationDbContext DbContext
+
+<ul class="navbar-nav">
+@if (SignInManager.IsSignedIn(User))
+{
+    var email = User.Identity?.Name;
+    var displayName = email?.Split('@')[0]; // Default to username part of email
+
+    if (!string.IsNullOrEmpty(email))
+    {
+        if (User.IsInRole("Doctor"))
+        {
+            var doc = DbContext.Doctors.FirstOrDefault(d => d.Email == email);
+            if (doc != null) displayName = doc.FullName;
+        }
+        else if (User.IsInRole("Patient"))
+        {
+            var pat = DbContext.Patients.FirstOrDefault(p => p.UserId == UserManager.GetUserId(User));
+            if (pat != null) displayName = pat.FullName;
+        }
+        else if (User.IsInRole("Receptionist"))
+        {
+            var rec = DbContext.Receptionists.FirstOrDefault(r => r.Email == email);
+            if (rec != null) displayName = rec.FullName;
+        }
+        else if (User.IsInRole("Admin"))
+        {
+            displayName = "Admin";
+        }
+    }
+
+    <li class="nav-item d-flex align-items-center">
+        <span class="nav-link text-dark">مرحباً <strong dir="ltr">@displayName</strong></span>
+    </li>
+    <li class="nav-item">
+        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+            <button  type="submit" class="nav-link btn btn-link text-danger fw-bold text-decoration-none">تسجيل الخروج</button>
+        </form>
+    </li>
+}
+else
+{
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">تسجيل مريض جديد</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-primary fw-bold" asp-area="Identity" asp-page="/Account/Login">تسجيل الدخول</a>
+    </li>
+}
+</ul>

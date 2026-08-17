@@ -1,0 +1,54 @@
+@model ClinicManagementSystem.Models.ViewModels.AppointmentFormViewModel
+
+@{
+    ViewData["Title"] = "حجز موعد جديد";
+}
+
+<h1>حجز موعد جديد</h1>
+
+<h4>الموعد</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="PatientId" class="control-label"></label>
+                <select asp-for="PatientId" class="form-control" asp-items="Model.Patients">
+                    <option value="">-- اختر المريض --</option>
+                </select>
+                <span asp-validation-for="PatientId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="DoctorId" class="control-label"></label>
+                <select asp-for="DoctorId" class="form-control" asp-items="Model.Doctors">
+                    <option value="">-- اختر الطبيب --</option>
+                </select>
+                <span asp-validation-for="DoctorId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="AppointmentDate" class="control-label"></label>
+                <input asp-for="AppointmentDate" class="form-control" type="datetime-local" dir="ltr" />
+                <span asp-validation-for="AppointmentDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Notes" class="control-label"></label>
+                <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Notes" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="حجز" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">العودة للقائمة</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

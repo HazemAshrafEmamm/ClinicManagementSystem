@@ -1,0 +1,86 @@
+@model IEnumerable<ClinicManagementSystem.Models.Appointment>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th class="ps-4">تاريخ ووقت الموعد</th>
+                <th>المريض</th>
+                <th>رقم الهاتف</th>
+                <th>الحالة</th>
+                <th class="text-center">إجراءات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="5" class="text-center py-5 text-muted">
+                        <i class="bi bi-calendar-x fs-1 d-block mb-2 opacity-50"></i>
+                        لا توجد مواعيد مسجلة في هذه القائمة.
+                    </td>
+                </tr>
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="ps-4 fw-bold text-secondary">
+                            <i class="bi bi-clock text-primary me-1"></i>
+                            @item.AppointmentDate.ToString("dd/MM/yyyy - hh:mm tt")
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-2">
+                                    <i class="bi bi-person-fill text-primary"></i>
+                                </div>
+                                <span class="fw-bold">@item.Patient?.FullName</span>
+                            </div>
+                        </td>
+                        <td><i class="bi bi-telephone text-muted me-1"></i> @item.Patient?.Phone</td>
+                        <td>
+                            @if (item.Status == ClinicManagementSystem.Models.AppointmentStatus.Pending)
+                            {
+                                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill"><i class="bi bi-hourglass-split"></i> قيد الانتظار</span>
+                            }
+                            else if (item.Status == ClinicManagementSystem.Models.AppointmentStatus.Confirmed)
+                            {
+                                <span class="badge bg-info text-dark px-3 py-2 rounded-pill"><i class="bi bi-calendar-check"></i> مؤكد</span>
+                            }
+                            else if (item.Status == ClinicManagementSystem.Models.AppointmentStatus.Completed)
+                            {
+                                <span class="badge bg-success px-3 py-2 rounded-pill"><i class="bi bi-check2-all"></i> مكتمل</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger px-3 py-2 rounded-pill"><i class="bi bi-x-circle"></i> ملغى</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @if (item.Status == ClinicManagementSystem.Models.AppointmentStatus.Pending || item.Status == ClinicManagementSystem.Models.AppointmentStatus.Confirmed)
+                            {
+                                <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <input type="hidden" name="status" value="Completed" />
+                                    <input type="hidden" name="notes" value="" />
+                                    <button type="submit" class="btn btn-sm btn-outline-success px-3 rounded-pill fw-bold shadow-sm">
+                                        <i class="bi bi-check-circle-fill"></i> اكتمل
+                                    </button>
+                                </form>
+                            }
+                            else if (item.Status == ClinicManagementSystem.Models.AppointmentStatus.Completed)
+                            {
+                                <span class="text-muted fw-bold opacity-50"><i class="bi bi-check2-all"></i> تم الكشف</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted fw-bold opacity-50"><i class="bi bi-x-circle"></i> ملغى</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

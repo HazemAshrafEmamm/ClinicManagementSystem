@@ -1,0 +1,153 @@
+@model ClinicManagementSystem.Models.ViewModels.AppointmentFormViewModel
+@{
+    ViewData["Title"] = "حجز موعد جديد";
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="BookAppointment" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            
+            <!-- Hidden field for PatientId (the controller will also verify server-side) -->
+            <input type="hidden" asp-for="PatientId" />
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">اختر التخصص</label>
+                            <select id="specialtySelect" class="form-select" asp-items="ViewBag.Specialties">
+                                <option value="">-- اختر التخصص --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="DoctorId" class="form-label">الطبيب</label>
+                            <select asp-for="DoctorId" class="form-select" asp-items="ViewBag.Doctors">
+                                <option value="">-- اختر التخصص أولاً --</option>
+                            </select>
+                            <span asp-validation-for="DoctorId" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label asp-for="AppointmentDate" class="form-label fw-bold">تاريخ الموعد (اليوم)</label>
+                            <input asp-for="AppointmentDate" type="date" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                            <span asp-validation-for="AppointmentDate" class="text-danger"></span>
+                            <small class="text-muted d-block mt-2">
+                                <i class="bi bi-info-circle"></i> ستقوم بحجز اليوم المبدئي فقط. سيقوم قسم الاستقبال بالتواصل معك لتحديد الوقت الدقيق وتأكيد الحجز.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="doctorScheduleContainer" class="card shadow-sm mb-4 d-none border-info">
+                <div class="card-header bg-info text-white fw-bold">
+                    <i class="bi bi-calendar-week"></i> أيام وساعات عمل الطبيب
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-2">يرجى التأكد من اختيار يوم يوافق جدول عمل الطبيب الموضح أدناه:</p>
+                    <ul id="doctorScheduleList" class="list-group list-group-flush mb-0">
+                        <!-- Schedules will be populated here -->
+                    </ul>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-calendar-check"></i> تأكيد الحجز المبدئي</button>
+                <a asp-action="Index" class="btn btn-secondary">إلغاء</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+            function loadDoctorSchedules() {
+                var doctorId = $('#DoctorId').val();
+                var scheduleContainer = $('#doctorScheduleContainer');
+                var scheduleList = $('#doctorScheduleList');
+                
+                if (doctorId) {
+                    $.getJSON('@Url.Action("GetDoctorSchedules", "PatientPortal")', { doctorId: doctorId }, function (data) {
+                        scheduleList.empty();
+                        if (data.length === 0) {
+                            scheduleList.append('<li class="list-group-item text-danger border-0 px-0">عفواً، الطبيب ليس لديه مواعيد عمل مسجلة حالياً.</li>');
+                        } else {
+                            $.each(data, function (index, item) {
+                                scheduleList.append(
+                                    '<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2 border-bottom">' +
+                                    '<span class="fw-bold"><i class="bi bi-calendar2-day me-2 text-primary"></i> ' + item.dayName + '</span>' +
+                                    '<span class="badge bg-light text-dark border"><i class="bi bi-clock me-1"></i> من ' + item.startTime + ' إلى ' + item.endTime + '</span>' +
+                                    '</li>'
+                                );
+                            });
+                        }
+                        scheduleContainer.removeClass('d-none');
+                    });
+                } else {
+                    scheduleContainer.addClass('d-none');
+                }
+            }
+
+            $('#specialtySelect').change(function () {
+                var specialtyId = $(this).val();
+                var doctorSelect = $('#DoctorId');
+                doctorSelect.empty();
+                doctorSelect.append($('<option/>', {
+                    value: '',
+                    text: '-- جاري التحميل --'
+                }));
+                $('#doctorScheduleContainer').addClass('d-none');
+
+                if (specialtyId) {
+                    $.getJSON('@Url.Action("GetDoctorsBySpecialty", "PatientPortal")', { specialtyId: specialtyId }, function (data) {
+                        doctorSelect.empty();
+                        if(data.length === 0){
+                            doctorSelect.append($('<option/>', {
+                                value: '',
+                                text: '-- لا يوجد أطباء في هذا التخصص --'
+                            }));
+                        } else {
+                            doctorSelect.append($('<option/>', {
+                                value: '',
+                                text: '-- اختر الطبيب --'
+                            }));
+                            $.each(data, function (index, item) {
+                                doctorSelect.append($('<option/>', {
+                                    value: item.id,
+                                    text: item.fullName
+                                }));
+                            });
+                        }
+                    });
+                } else {
+                    doctorSelect.empty();
+                    doctorSelect.append($('<option/>', {
+                        value: '',
+                        text: '-- اختر التخصص أولاً --'
+                    }));
+                }
+            });
+
+            $('#DoctorId').change(function() {
+                loadDoctorSchedules();
+            });
+            
+            // If editing/reloading with a doctor already selected
+            if ($('#DoctorId').val()) {
+                loadDoctorSchedules();
+            }
+        });
+    </script>
+}
