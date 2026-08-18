@@ -34,7 +34,7 @@ The **Clinic Management System** is an enterprise-grade web application develope
 | **Admin** | `admin@clinic.com` | `Admin123!` |
 | **Doctor** | `Dsara@clinic.com` | `Doctor123!` |
 | **Receptionist** | `ReMohamed@clinic.com` | `Receptionist123!` |
-| **Patient** | `Phesham@gmail.com` | `1234567890Ha#` |
+| **Patient** | `Pziad@clinic.com` | `Patient123!` |
 
 > [!NOTE]
 > **Important:** The live demo is hosted on a free tier which does not provide an SSL certificate by default. Please ensure you access the site using **`http://`** and not `https://`. You may safely ignore any "Not Secure" browser warnings during testing.
